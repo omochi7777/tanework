@@ -112,6 +112,26 @@
     padding: 28px 0 48px; border-top: 2px solid var(--ink); font-size: 14px;
   }
 
+  /* 外部サイトへの移動案内 */
+  .external-dialog {
+    width: min(420px, calc(100% - 32px)); max-height: calc(100% - 32px);
+    padding: 28px; border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+    background: var(--cream); color: var(--ink); font-family: var(--body);
+  }
+  .external-dialog::backdrop { background: rgb(3 3 4 / 65%); }
+  .external-dialog h2 { margin: 0 0 10px; font-family: var(--display); font-size: 24px; line-height: 1.4; }
+  .external-dialog p { margin: 0 0 12px; }
+  .external-dialog .destination { overflow-wrap: anywhere; font-size: 14px; font-weight: 700; }
+  .dialog-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .dialog-actions button, .dialog-actions a {
+    display: inline-block; padding: 9px 18px; border: 2px solid var(--ink);
+    background: var(--cream); color: var(--ink); font: 700 15px var(--body);
+    text-align: center; text-decoration: none; cursor: pointer;
+  }
+  .dialog-actions .continue { background: var(--yellow); }
+  .dialog-actions button:hover, .dialog-actions a:hover { background: var(--mint); color: var(--ink); }
+  .dialog-actions button:focus-visible, .dialog-actions a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
   @media (max-width: 600px) {
     .section-title { font-size: 38px; }
     .blob { right: -10px; width: 48px; height: 48px; }
@@ -230,6 +250,39 @@
     <a href="https://github.com/omochi7777" target="_blank" rel="noopener">GitHub</a>
   </div></div>
 </footer>
+
+<dialog class="external-dialog" id="external-dialog" aria-labelledby="external-dialog-title" aria-describedby="external-dialog-description">
+  <h2 id="external-dialog-title">外部サイトを開きます</h2>
+  <p id="external-dialog-description">リンク先は別のサイトです。新しいタブで開きますか？</p>
+  <p class="destination" id="external-destination"></p>
+  <div class="dialog-actions">
+    <button type="button" id="external-cancel">戻る</button>
+    <a class="continue" id="external-continue" href="#" target="_blank" rel="noopener noreferrer">サイトを開く ↗</a>
+  </div>
+</dialog>
+
+<script>
+  const externalDialog = document.getElementById('external-dialog');
+  const destination = document.getElementById('external-destination');
+  const continueLink = document.getElementById('external-continue');
+  const cancelButton = document.getElementById('external-cancel');
+  let previousLink;
+
+  document.querySelectorAll('.card[target="_blank"], .site-footer a[target="_blank"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      previousLink = link;
+      continueLink.href = link.href;
+      destination.textContent = new URL(link.href).hostname;
+      externalDialog.showModal();
+      cancelButton.focus();
+    });
+  });
+
+  cancelButton.addEventListener('click', () => externalDialog.close());
+  continueLink.addEventListener('click', () => externalDialog.close());
+  externalDialog.addEventListener('close', () => previousLink?.focus());
+</script>
 
 </body>
 </html>
