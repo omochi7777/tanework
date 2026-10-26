@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tane works</title>
+<meta name="description" content="tane がつくった、ブラウザで遊べるお絵かきツールとゲームの置き場。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23F975B1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F8E3CC;
+    --ink:   #030304;
+    --blue:  #0446A9;
+    --pink:  #F975B1;
+    --mint:  #83C6C1;
+    --teal:  #1D9BB9;
+    --yellow:#FBDA5F;
+    --display: "Dela Gothic One", sans-serif;
+    --body: "Zen Kaku Gothic New", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.75;
+  }
+  a { color: var(--ink); }
+  a:hover { color: var(--blue); }
+  a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ヘッダー */
+  .site-header { border-bottom: 2px solid var(--ink); }
+  .site-header .wrap {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 16px; padding-top: 22px; padding-bottom: 22px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo span { font-family: var(--display); font-size: 28px; line-height: 1; }
+  .site-header nav { display: flex; gap: 28px; font-weight: 700; font-size: 17px; }
+
+  /* 見出し */
+  .section-title {
+    display: flex; align-items: center; gap: 14px;
+    margin: 0 0 40px; font-family: var(--display); font-weight: 400; font-size: 48px; line-height: 1.2;
+  }
+
+  /* 作品一覧 */
+  #works { padding: 64px 0 80px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+    gap: 44px 36px;
+  }
+  .card {
+    position: relative; display: flex; flex-direction: column;
+    background: var(--cream); border: 2px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    text-decoration: none; color: var(--ink);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover, .card:focus-visible { color: var(--ink); transform: translate(-3px, -3px); box-shadow: 10px 10px 0 var(--ink); }
+  .card:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--ink); }
+  .blob {
+    position: absolute; z-index: 1; top: -22px; right: -18px;
+    width: 56px; height: 56px; border: 2px solid var(--ink);
+    transition: transform .4s cubic-bezier(.3, 1.7, .5, 1);
+  }
+  .card:hover .blob, .card:focus-visible .blob { transform: rotate(90deg) scale(1.15); }
+  .thumb {
+    display: block; aspect-ratio: 16 / 10; overflow: hidden;
+    border-bottom: 2px solid var(--ink);
+  }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* サムネイル未用意の作品用 */
+  .thumb.placeholder { display: flex; align-items: center; justify-content: center; }
+  .thumb.placeholder span {
+    font-family: var(--display); font-size: 26px; text-align: center; line-height: 1.3;
+    padding: 0 20px; background: var(--cream); border: 2px solid var(--ink); padding: 8px 16px;
+  }
+  .body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 20px; }
+  .row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+  .name { font-family: var(--display); font-size: 21px; line-height: 1.35; }
+  .tag {
+    flex: none; font-size: 12px; font-weight: 700; line-height: 1.6;
+    padding: 2px 10px; border-radius: 999px; background: var(--ink); color: var(--cream);
+  }
+  .desc { margin: 0; font-size: 14px; }
+
+  /* About */
+  #about { padding: 0 0 80px; }
+  .about-box {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 40px;
+    border: 2px solid var(--ink); padding: 40px; box-shadow: 6px 6px 0 var(--ink);
+  }
+  .about-mark { position: relative; width: 160px; height: 160px; flex: none; }
+  .about-mark .c { position: absolute; left: 24px; top: 0; width: 136px; height: 136px; border-radius: 50%; background: var(--yellow); }
+  .about-mark .s { position: absolute; left: 0; top: 70px; width: 80px; height: 80px; background: var(--mint); mix-blend-mode: multiply; }
+  .about-text { flex: 1 1 320px; }
+  .about-text h2 { margin: 0 0 12px; font-family: var(--display); font-weight: 400; font-size: 34px; line-height: 1.2; }
+  .about-text p { margin: 0; font-size: 15px; line-height: 1.9; }
+
+  /* フッター */
+  .site-footer .inner {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+    padding: 28px 0 48px; border-top: 2px solid var(--ink); font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .section-title { font-size: 38px; }
+    .blob { right: -10px; width: 48px; height: 48px; }
+    .about-text { min-width: 0; flex-basis: 100%; }
+    .about-box { padding: 28px; gap: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .card, .blob { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="logo" href="#top">
+      <span>tane</span>
+      <svg width="60" height="18" viewBox="0 0 60 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#F975B1"/><rect x="22" y="1" width="16" height="16" fill="#0446A9"/><path d="M51 1 L59 17 L43 17 Z" fill="#FBDA5F"/></svg>
+    </a>
+    <nav aria-label="メイン">
+      <a href="#works">Works</a>
+      <a href="#about">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="works">
+    <h1 class="section-title">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="#F975B1"/></svg>
+      Works
+    </h1>
+
+    <div class="grid">
+
+      <!--
+        作品を足すときは、下の <a class="card"> … </a> をまるごとコピーして、
+        href（URL）・画像・名前・タグ・紹介文を書き換えてください。
+        右上の飾り図形は .blob の style で色と形（border-radius）を変えられます。
+      -->
+
+      <a class="card" href="https://omochi7777.github.io/nijimisuisai/" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--yellow); border-radius: 14px;"></span>
+        <span class="thumb"><img src="images/nijimi.png" alt="にじみ帖で描いた水彩のにじみ" loading="lazy"></span>
+        <span class="body">
+          <span class="row"><span class="name">にじみ帖</span><span class="tag">ツール</span></span>
+          <p class="desc">にじみ・かすれ・混色まで楽しめる、ブラウザで描ける水彩お絵かきツール。</p>
+        </span>
+      </a>
+
+      <a class="card" href="https://image-gacha.tane7777.chatgpt.site/" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--blue); border-radius: 50% 0 50% 50%;"></span>
+        <span class="thumb"><img src="images/image-gacha.png" alt="イメージガチャの画面。テーマや技法などのカードが並んでいる" loading="lazy" style="object-position: top;"></span>
+        <span class="body">
+          <span class="row"><span class="name">イメージガチャ</span><span class="tag">ツール</span></span>
+          <p class="desc">テーマ・画風・色合いなど7つの要素をガチャで引いて、画像生成AI用のプロンプトをつくるツール。</p>
+        </span>
+      </a>
+
+      <a class="card" href="https://omochi7777.github.io/nobinobijump/" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--pink);"></span>
+        <span class="thumb"><img src="images/nobinobijump.png" alt="のびのびジャンプのタイトル画面" loading="lazy" style="object-position: center 15%;"></span>
+        <span class="body">
+          <span class="row"><span class="name">のびのびジャンプ</span><span class="tag">ゲーム</span></span>
+          <p class="desc">足場をつたって、どこまでも高く。ハイスコアを目指すジャンプゲーム。</p>
+        </span>
+      </a>
+
+      <a class="card" href="https://claude.ai/artifact/AjKH5QWiJChBfgsNXm8thi" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--mint); border-radius: 50%;"></span>
+        <span class="thumb"><img src="images/surimono.jpg" alt="Surimonoのポスター制作画面" loading="lazy" style="object-position: top;"></span>
+        <span class="body">
+          <span class="row"><span class="name">Surimono</span><span class="tag">ツール</span></span>
+          <p class="desc">色・形・質感を組み合わせて、自分だけのポスターをつくるジェネラティブ・ポスター工房。</p>
+        </span>
+      </a>
+
+      <a class="card" href="https://claude.ai/artifact/Jko32dVg29DFBnmjVAohQV" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--teal);"></span>
+        <!-- 画像ができたら <span class="thumb"><img src="images/starwell.png" alt="…" loading="lazy"></span> に差し替え -->
+        <span class="thumb placeholder" style="background: var(--blue);"><span>Starwell<br>TEA ROOM</span></span>
+        <span class="body">
+          <span class="row"><span class="name">starwell TEA ROOM</span><span class="tag">3D</span></span>
+          <p class="desc">森から雲海、星空へとのぼっていく、昇降式の喫茶室の 3D シーン。</p>
+        </span>
+      </a>
+
+      <a class="card" href="https://claude.ai/artifact/XTxxDWmNndbk2ZHGhfYoqZ" target="_blank" rel="noopener">
+        <span class="blob" aria-hidden="true" style="background: var(--pink); border-radius: 50% 0 50% 50%;"></span>
+        <!-- 画像ができたら <span class="thumb"><img src="images/effects.png" alt="…" loading="lazy"></span> に差し替え -->
+        <span class="thumb placeholder" style="background: var(--yellow);"><span>Three.js<br>エフェクト図鑑</span></span>
+        <span class="body">
+          <span class="row"><span class="name">Three.js エフェクト図鑑</span><span class="tag">ツール</span></span>
+          <p class="desc">Three.js で使える49種類の画面エフェクトを、動かしながら見比べられる図鑑。</p>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="about-box">
+      <div class="about-mark" aria-hidden="true"><span class="c"></span><span class="s"></span></div>
+      <div class="about-text">
+        <h2>About</h2>
+        <p>絵を描いたり、色や形を組み合わせたり、ちょっと遊んでみたり。<br>ブラウザで楽しめるお絵かきツールやゲームをつくっています。<br>気になる作品を、のぞいていってください。</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap"><div class="inner">
+    <span>© 2026 tane</span>
+    <a href="https://github.com/omochi7777" target="_blank" rel="noopener">GitHub</a>
+  </div></div>
+</footer>
+
+</body>
+</html>
